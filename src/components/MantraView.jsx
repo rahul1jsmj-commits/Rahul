@@ -93,6 +93,7 @@ function CounterScreen({ mantra }) {
     daysElapsed,
     daysRemaining,
     mantrasRemaining,
+    groupedHistory,
     TOTAL_DAYS,
     TOTAL_TARGET,
     countMantra,
@@ -248,6 +249,103 @@ function CounterScreen({ mantra }) {
           </div>
         )}
       </div>
+
+      {/* Daily log */}
+      {groupedHistory.length > 0 && <DailyLog entries={groupedHistory} />}
+    </div>
+  )
+}
+
+function DailyLog({ entries }) {
+  const [open, setOpen] = useState(false)
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00')
+    const today = new Date()
+    today.setHours(12, 0, 0, 0)
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    if (d.toDateString() === today.toDateString()) return 'Today'
+    if (d.toDateString() === yesterday.toDateString()) return 'Yesterday'
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  }
+
+  return (
+    <div className="mt-6">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: '0 0 12px 0',
+        }}
+      >
+        <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#555' }}>
+          Daily Log · {entries.length} day{entries.length !== 1 ? 's' : ''}
+        </p>
+        <span style={{ color: '#444', fontSize: 16, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+          ›
+        </span>
+      </button>
+
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {entries.map(({ date, count, times }) => (
+            <div
+              key={date}
+              style={{
+                background: '#111',
+                border: '1px solid #1a1a1a',
+                borderRadius: 14,
+                padding: '12px 14px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: times.some(Boolean) ? 8 : 0 }}>
+                <span style={{ fontSize: 14, color: '#d0d0d0', fontWeight: 500 }}>
+                  {formatDate(date)}
+                </span>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: GOLD,
+                    background: GOLD_DIM,
+                    borderRadius: 8,
+                    padding: '2px 10px',
+                  }}
+                >
+                  {count} {count === 1 ? 'mantra' : 'mantras'}
+                </span>
+              </div>
+              {times.some(Boolean) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {times.map((t, i) =>
+                    t ? (
+                      <span
+                        key={i}
+                        style={{
+                          fontSize: 11,
+                          color: '#555',
+                          background: '#181818',
+                          borderRadius: 6,
+                          padding: '2px 8px',
+                        }}
+                      >
+                        {t}
+                      </span>
+                    ) : null
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

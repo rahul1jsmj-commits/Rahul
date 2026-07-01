@@ -47,11 +47,11 @@ export function useMantra() {
   }, [update])
 
   const countMantra = useCallback(() => {
-    const today = new Date().toISOString().slice(0, 10)
     update((s) => ({
       ...s,
       totalCount: s.totalCount + 1,
-      history: [...(s.history ?? []), today],
+      // store full ISO timestamp so we can show time-of-tap in the log
+      history: [...(s.history ?? []), new Date().toISOString()],
     }))
   }, [update])
 
@@ -73,12 +73,31 @@ export function useMantra() {
   const daysRemaining = Math.max(0, TOTAL_DAYS - daysElapsed)
   const mantrasRemaining = Math.max(0, TOTAL_TARGET - state.totalCount)
 
+  // Group history by calendar date, newest first.
+  // Entries may be 'YYYY-MM-DD' (old) or full ISO timestamp (new) — both work.
+  const groupedHistory = (() => {
+    const map = {}
+    for (const entry of (state.history ?? [])) {
+      const date = entry.slice(0, 10)
+      const isTimestamp = entry.length > 10
+      const time = isTimestamp
+        ? new Date(entry).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+        : null
+      if (!map[date]) map[date] = []
+      map[date].push(time)
+    }
+    return Object.entries(map)
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([date, times]) => ({ date, count: times.length, times }))
+  })()
+
   return {
     startDate: state.startDate,
     totalCount: state.totalCount,
     daysElapsed,
     daysRemaining,
     mantrasRemaining,
+    groupedHistory,
     TOTAL_DAYS,
     TOTAL_TARGET,
     setStartDate,
