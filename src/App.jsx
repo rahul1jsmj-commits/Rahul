@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useHabits } from './hooks/useHabits'
+import { useMantra } from './hooks/useMantra'
 import { TodayView } from './components/TodayView'
 import { DashboardView } from './components/DashboardView'
 import { SettingsView } from './components/SettingsView'
+import { MantraView } from './components/MantraView'
 
 export default function App() {
-  const [tab, setTab] = useState('today')
+  const [tab, setTab] = useState('japa')
   const {
     habits,
     addHabit,
@@ -15,10 +17,12 @@ export default function App() {
     completionRatio,
     todayCompletions,
   } = useHabits()
+  const mantra = useMantra()
 
   return (
     <div className="flex flex-col min-h-dvh max-w-md mx-auto relative">
       <main className="flex-1 overflow-y-auto">
+        {tab === 'japa' && <MantraView mantra={mantra} />}
         {tab === 'today' && (
           <TodayView
             habits={habits}
@@ -50,8 +54,9 @@ export default function App() {
           paddingTop: '12px',
         }}
       >
+        <NavButton active={tab === 'japa'} onClick={() => setTab('japa')} label="Japa" icon={<JapaIcon />} />
         <NavButton active={tab === 'today'} onClick={() => setTab('today')} label="Today" icon={<TodayIcon />} />
-        <NavButton active={tab === 'dashboard'} onClick={() => setTab('dashboard')} label="Dashboard" icon={<GridIcon />} />
+        <NavButton active={tab === 'dashboard'} onClick={() => setTab('dashboard')} label="Stats" icon={<GridIcon />} />
         <NavButton active={tab === 'settings'} onClick={() => setTab('settings')} label="Settings" icon={<SettingsIcon />} />
       </nav>
     </div>
@@ -70,6 +75,15 @@ function NavButton({ active, onClick, label, icon }) {
       </span>
       <span className="text-[10px] tracking-wide">{label}</span>
     </button>
+  )
+}
+
+function JapaIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <circle cx="11" cy="11" r="8.5" stroke="currentColor" strokeWidth="1.5" />
+      <text x="11" y="15.5" textAnchor="middle" fontSize="10" fill="currentColor" fontWeight="600">ॐ</text>
+    </svg>
   )
 }
 
