@@ -63,6 +63,33 @@ export function useMantra() {
     })
   }, [update])
 
+  const correctCount = useCallback((count) => {
+    update((s) => ({ ...s, totalCount: Math.max(0, Math.floor(count)) }))
+  }, [update])
+
+  const exportData = useCallback(() => {
+    const raw = localStorage.getItem(STORAGE_KEY) ?? '{}'
+    const blob = new Blob([raw], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'mantra-japa-backup.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [])
+
+  const importData = useCallback((jsonStr) => {
+    try {
+      const parsed = JSON.parse(jsonStr)
+      if (typeof parsed.totalCount !== 'number') throw new Error('invalid')
+      save(parsed)
+      setState(parsed)
+      return true
+    } catch {
+      return false
+    }
+  }, [])
+
   const reset = useCallback(() => {
     save(DEFAULT_STATE)
     setState(DEFAULT_STATE)
@@ -103,6 +130,9 @@ export function useMantra() {
     setStartDate,
     countMantra,
     undoLast,
+    correctCount,
+    exportData,
+    importData,
     reset,
   }
 }
