@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useHabits } from './hooks/useHabits'
 import { useMantra } from './hooks/useMantra'
+import { useTranscripts } from './hooks/useTranscripts'
 import { TodayView } from './components/TodayView'
 import { DashboardView } from './components/DashboardView'
 import { SettingsView } from './components/SettingsView'
 import { MantraView } from './components/MantraView'
+import { ReelsView } from './components/ReelsView'
 
 export default function App() {
   const [tab, setTab] = useState('japa')
@@ -18,6 +20,7 @@ export default function App() {
     todayCompletions,
   } = useHabits()
   const mantra = useMantra()
+  const reels = useTranscripts()
 
   return (
     <div className="flex flex-col min-h-dvh max-w-md mx-auto relative">
@@ -33,6 +36,7 @@ export default function App() {
         {tab === 'dashboard' && (
           <DashboardView habits={habits} completionRatio={completionRatio} />
         )}
+        {tab === 'reels' && <ReelsView reels={reels} />}
         {tab === 'settings' && (
           <SettingsView
             habits={habits}
@@ -57,6 +61,7 @@ export default function App() {
         <NavButton active={tab === 'japa'} onClick={() => setTab('japa')} label="Japa" icon={<JapaIcon />} />
         <NavButton active={tab === 'today'} onClick={() => setTab('today')} label="Today" icon={<TodayIcon />} />
         <NavButton active={tab === 'dashboard'} onClick={() => setTab('dashboard')} label="Stats" icon={<GridIcon />} />
+        <NavButton active={tab === 'reels'} onClick={() => setTab('reels')} label="Reels" icon={<ReelsIcon />} />
         <NavButton active={tab === 'settings'} onClick={() => setTab('settings')} label="Settings" icon={<SettingsIcon />} />
       </nav>
     </div>
@@ -103,6 +108,15 @@ function GridIcon() {
       <rect x="13" y="3" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
       <rect x="3" y="13" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
       <rect x="13" y="13" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+function ReelsIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <rect x="3" y="4" width="16" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M9 8.5L14 11L9 13.5V8.5Z" fill="currentColor" />
     </svg>
   )
 }
