@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Environment variables
+.env
+
+# Reel transcriber backend
+server/*.db
+server/*.db-journal
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
